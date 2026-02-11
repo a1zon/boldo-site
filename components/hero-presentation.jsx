@@ -68,7 +68,7 @@ export function HeroPresentation() {
                   asChild
                   className="h-12 px-6 rounded-full bg-[#8b5cf6] text-white font-semibold hover:bg-[#a78bfa] text-base shadow-md w-fit"
                 >
-                  <a href="https://boldo.agency/Boldo.pdf" target="_blank" rel="noreferrer">
+                  <a href="/Boldo.pdf" target="_blank" rel="noreferrer">
                     Get our pitchdeck
                   </a>
                 </Button>
