@@ -7,7 +7,6 @@ function AnimatedCounter({ target, isVisible }) {
   const [count, setCount] = useState(0)
   const hasAnimatedRef = useRef(false)
 
-  // Parse the target value to extract the number
   const parseNumber = (value) => {
     const num = parseFloat(value.replace(/[^\d.]/g, ""))
     return isNaN(num) ? 0 : num
@@ -16,15 +15,8 @@ function AnimatedCounter({ target, isVisible }) {
   const targetNum = parseNumber(target)
 
   useEffect(() => {
-    // If already animated or not visible, don't do anything
-    if (hasAnimatedRef.current || !isVisible) {
-      return
-    }
-
-    // Mark as animated
+    if (hasAnimatedRef.current || !isVisible) return
     hasAnimatedRef.current = true
-
-    let isMounted = true
 
     const animate = () => {
       setCount((prev) => {
@@ -37,61 +29,38 @@ function AnimatedCounter({ target, isVisible }) {
     }
 
     const interval = setInterval(animate, 30)
-
-    return () => {
-      clearInterval(interval)
-      isMounted = false
-    }
+    return () => clearInterval(interval)
   }, [targetNum, isVisible])
 
-  // Format the number based on the target
   const formatNumber = (num) => {
-    if (target.includes("%")) {
-      return `${num.toFixed(1)}%`
-    }
-    if (target.includes("+")) {
-      return `${Math.round(num)}+`
-    }
-    if (target.includes("ms")) {
-      return `${Math.round(num)}ms`
-    }
-    if (target.includes("/")) {
-      return `${num.toFixed(1)}/5`
-    }
+    if (target.includes("%")) return `${num.toFixed(1)}%`
+    if (target.includes("+")) return `${Math.round(num)}+`
+    if (target.includes("ms")) return `${Math.round(num)}ms`
+    if (target.includes("/")) return `${num.toFixed(1)}/5`
     return num.toFixed(0)
   }
 
   return <>{formatNumber(count)}</>
 }
 
-function CaseImage({ src, alt, caseId }) {
-  const [isPortrait, setIsPortrait] = useState(false)
-  const imgRef = useRef(null)
-
-  useEffect(() => {
-    const img = new Image()
-    img.onload = () => {
-      setIsPortrait(img.height > img.width)
-    }
-    img.src = src
-  }, [src])
-
+function MetricCard({ metric, isVisible, delay = 0 }) {
   return (
-    <div className={`relative rounded-xl overflow-hidden group/image ${isPortrait ? "w-full max-w-xs mx-auto" : "w-full"}`}>
-      <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 from-transparent via-transparent to-black/10" />
-      <img
-        ref={imgRef}
-        src={src}
-        alt={alt}
-        className="w-full h-auto object-cover transition-transform duration-500 group-hover/image:scale-105"
-      />
-      <div className="absolute inset-0 border border-black/10 rounded-xl" />
+    <div
+      className="group/metric relative p-4 rounded-xl border border-black/5 bg-white/80 hover:bg-white hover:shadow-md hover:border-black/10 transition-all duration-300 hover:-translate-y-0.5"
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      <div className="text-xs font-medium text-black/45 mb-1.5 uppercase tracking-wide">
+        {metric.label}
+      </div>
+      <div className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
+        <AnimatedCounter target={metric.value} isVisible={isVisible} />
+      </div>
+      <div className="absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-[--brand-500] to-[--brand-400] rounded-full scale-x-0 group-hover/metric:scale-x-100 transition-transform duration-300 origin-left" />
     </div>
   )
 }
 
 export function CasesCard() {
-  const [hoveredCase, setHoveredCase] = useState(null)
   const [visibleCases, setVisibleCases] = useState(new Set())
   const caseRefs = useRef({})
 
@@ -102,16 +71,10 @@ export function CasesCard() {
           const caseId = entry.target.dataset.caseId
           if (entry.isIntersecting) {
             setVisibleCases((prev) => new Set([...prev, parseInt(caseId)]))
-          } else {
-            setVisibleCases((prev) => {
-              const newSet = new Set(prev)
-              newSet.delete(parseInt(caseId))
-              return newSet
-            })
           }
         })
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     )
 
     Object.values(caseRefs.current).forEach((ref) => {
@@ -130,188 +93,105 @@ export function CasesCard() {
       id: 1,
       title: "AI-waiter and QR-menu",
       subtitle: "Improving the stability of key user scenarios for the QR-menu with an AI assistant",
-      bgColor: "from-blue-600 to-blue-400",
-      tagBg: "bg-blue-500/10 border-blue-200",
-      image: "/cases/Снимок экрана 2026-01-16 в 09.54.11.png",
-      layout: "text-left", // текст слева, картинка и метрики справа
-      tags: ["Mobile app testing", "Bug retesting", "Performance testing", "UX-flow testing", "Web testing"],
+      description: "We went through every screen of the QR-menu app on 12 different devices — iPhones, Androids, tablets in restaurant conditions with poor Wi-Fi. We simulated real guest behavior: scanning QR, browsing the menu, adding items, paying, and tracking order status. Found 47 bugs in the first sprint alone — broken layout on small screens, payment timeouts under load, AI-assistant giving wrong ETAs when the kitchen queue was long. After 3 regression cycles the ordering flow became rock-solid: zero crashes, sub-second response, and the AI now calculates wait time to the minute.",
+      accentColor: "#3b82f6",
+      slideImage: "/cases/case1-slide.png",
+      tags: ["Mobile app testing (iOS & Android)", "Bug retesting and regression", "Performance of ordering scenarios", "UX-flow testing", "Web testing"],
       metrics: [
         { label: "App Stability", value: "99.2%" },
         { label: "Order Accuracy", value: "98.7%" },
         { label: "Response Time", value: "145ms" },
-        { label: "User Satisfaction", value: "4.8/5" }
+        { label: "User Satisfaction", value: "4.8/5" },
       ],
     },
     {
       id: 2,
       title: "AI Telephony",
       subtitle: "Improving the reliability of integrations and stability of key scenarios in AI telephony for mass customer requests",
-      bgColor: "from-teal-600 to-teal-400",
-      tagBg: "bg-teal-500/10 border-teal-200",
-      image: "/cases/telephony.png",
-      layout: "image-left", // картинка слева, текст и метрики справа
+      description: "The platform connects to five telephony providers — Mango, Telfin, Zadarma, OnlinePBX, and custom SIP. We tested every integration path end-to-end: CRM token setup, call routing, concurrent session handling, and failover scenarios. Ran load tests simulating 5000+ simultaneous calls to catch race conditions in the queue. Discovered critical bugs in token refresh logic and call handoff between providers. After our testing the integration setup went from a 3-step guessing game to a bulletproof flow — register, select provider, paste token, done.",
+      accentColor: "#0d9488",
+      slideImage: "/cases/case2-slide.png",
       tags: ["Web testing", "API testing", "Regression testing"],
       metrics: [
         { label: "Integration Reliability", value: "99.8%" },
         { label: "Call Success Rate", value: "97.3%" },
         { label: "Response Latency", value: "120ms" },
-        { label: "Concurrent Calls", value: "5000+" }
+        { label: "Concurrent Calls", value: "5000+" },
       ],
     },
   ]
 
   return (
-    <div className="space-y-8">
-      {cases.map((caseItem) => (
-        <div
-          key={caseItem.id}
-          ref={(el) => {
-            if (el) caseRefs.current[caseItem.id] = el
-          }}
-          data-case-id={caseItem.id}
-          className="group relative overflow-hidden rounded-2xl transition-all duration-300"
-          onMouseEnter={() => setHoveredCase(caseItem.id)}
-          onMouseLeave={() => setHoveredCase(null)}
-        >
-          {/* Background gradient */}
+    <div className="space-y-10">
+      {cases.map((caseItem) => {
+        const isVisible = visibleCases.has(caseItem.id)
+
+        return (
           <div
-            className={`absolute inset-0 bg-gradient-to-r ${caseItem.bgColor} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
-          />
-
-          {/* Content */}
-          {caseItem.layout === "text-left" ? (
-            // Layout 1: Metrics & Text left, Image right (full height)
-            <div className="relative grid md:grid-cols-2 gap-0 p-0">
-              {/* Left side - Text & Metrics */}
-              <div className="space-y-6 flex flex-col justify-center p-8 md:p-12">
-                <div className="space-y-3">
-                  <h3 className="text-3xl md:text-4xl font-semibold tracking-tight text-black">
-                    {caseItem.title}
-                  </h3>
-                  <p className="text-lg text-black/60 font-medium leading-relaxed">
-                    {caseItem.subtitle}
-                  </p>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2">
-                  {caseItem.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className={`text-xs font-medium px-3 py-1 rounded-full ${caseItem.tagBg} text-black/70 border border-black/10 bg-white/70`}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Metrics grid */}
-                <div className="grid grid-cols-2 gap-4 pt-4">
-                  {caseItem.metrics.map((metric, idx) => (
-                    <div
-                      key={idx}
-                      className={`p-4 rounded-lg border transition-all duration-300 transform ${
-                        hoveredCase === caseItem.id
-                          ? "scale-105 border-black/20 bg-white shadow-md"
-                          : "border-black/10 bg-white/70 hover:scale-102 hover:border-black/15"
-                      } backdrop-blur-sm`}
-                    >
-                      <div className="text-xs font-medium text-black/50 mb-1">
-                        {metric.label}
-                      </div>
-                      <div className="text-2xl font-semibold tracking-tight text-black">
-                        <AnimatedCounter
-                          target={metric.value}
-                          isVisible={visibleCases.has(caseItem.id)}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right side - Image (centered) */}
-              <div className="flex flex-col justify-center h-full min-h-96">
-                {caseItem.image && (
-                  <div className="relative rounded-2xl overflow-hidden group/image h-5/6 border border-black/10 max-w-sm mx-auto w-full bg-white/60">
-                    <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 from-transparent via-transparent to-black/10" />
-                    <img
-                      src={caseItem.image}
-                      alt={caseItem.title}
-                      className="w-full h-full object-cover object-center transition-transform duration-500 group-hover/image:scale-105"
-                    />
-                  </div>
-                )}
-              </div>
+            key={caseItem.id}
+            ref={(el) => {
+              if (el) caseRefs.current[caseItem.id] = el
+            }}
+            data-case-id={caseItem.id}
+            className="group relative rounded-3xl bg-white border border-black/5 shadow-sm overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-black/10"
+          >
+            {/* Slide image as hero */}
+            <div className="relative overflow-hidden">
+              <img
+                src={caseItem.slideImage}
+                alt={caseItem.title}
+                className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
-          ) : (
-            // Layout 2: Image left, Text & Metrics right (original)
-            <div className="relative grid md:grid-cols-2 gap-8 p-8 md:p-12">
-              {/* Left side - Image */}
-              <div className="flex flex-col justify-center">
-                {caseItem.image && (
-                  <CaseImage
-                    src={caseItem.image}
-                    alt={caseItem.title}
-                    caseId={caseItem.id}
+
+            {/* Content below the image */}
+            <div className="p-8 md:p-10 lg:p-12 space-y-6">
+              <div className="space-y-3">
+                <h3 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
+                  {caseItem.title}
+                </h3>
+                <p className="text-base text-black/55 font-medium leading-relaxed max-w-3xl">
+                  {caseItem.subtitle}
+                </p>
+                <p className="text-sm text-black/45 font-medium leading-relaxed max-w-3xl">
+                  {caseItem.description}
+                </p>
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {caseItem.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs font-medium px-3 py-1.5 rounded-full border border-black/5 bg-[--page-bg] text-black/60 transition-all duration-200 hover:border-black/15 hover:text-black/80 cursor-default"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              {/* Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {caseItem.metrics.map((metric, idx) => (
+                  <MetricCard
+                    key={idx}
+                    metric={metric}
+                    isVisible={isVisible}
+                    delay={idx * 60}
                   />
-                )}
-              </div>
-
-              {/* Right side - Text & Metrics */}
-              <div className="space-y-6 flex flex-col justify-center">
-                <div className="space-y-3">
-                  <h3 className="text-3xl md:text-4xl font-semibold tracking-tight text-black">
-                    {caseItem.title}
-                  </h3>
-                  <p className="text-lg text-black/60 font-medium leading-relaxed">
-                    {caseItem.subtitle}
-                  </p>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2">
-                  {caseItem.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className={`text-xs font-medium px-3 py-1 rounded-full ${caseItem.tagBg} text-black/70 border border-black/10 bg-white/70`}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Metrics grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  {caseItem.metrics.map((metric, idx) => (
-                    <div
-                      key={idx}
-                      className={`p-4 rounded-lg border transition-all duration-300 transform ${
-                        hoveredCase === caseItem.id
-                          ? "scale-105 border-black/20 bg-white shadow-md"
-                          : "border-black/10 bg-white/70 hover:scale-102 hover:border-black/15"
-                      } backdrop-blur-sm`}
-                    >
-                      <div className="text-xs font-medium text-black/50 mb-1">
-                        {metric.label}
-                      </div>
-                      <div className="text-2xl font-semibold tracking-tight text-black">
-                        <AnimatedCounter
-                          target={metric.value}
-                          isVisible={visibleCases.has(caseItem.id)}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
-          )}
 
-          {/* Bottom accent line */}
-          <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${caseItem.bgColor} scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`} />
-        </div>
-      ))}
+            {/* Bottom accent line */}
+            <div
+              className="absolute bottom-0 left-0 right-0 h-0.5 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
+              style={{ background: `linear-gradient(to right, ${caseItem.accentColor}, ${caseItem.accentColor}80)` }}
+            />
+          </div>
+        )
+      })}
     </div>
   )
 }
