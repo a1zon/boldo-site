@@ -13,12 +13,19 @@ export function ScrollAnimation() {
       setScrollProgress(scrolled)
     }
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left" 
-         style={{ transform: `scaleX(${scrollProgress})`, zIndex: 50 }} />
+    <div
+      className="fixed top-0 left-0 right-0 h-[3px] z-50 origin-left"
+      style={{
+        transform: `scaleX(${scrollProgress})`,
+        background: "linear-gradient(to right, var(--brand-500), var(--brand-400), #a78bfa)",
+        opacity: scrollProgress > 0.01 ? 1 : 0,
+        transition: "opacity 0.3s ease",
+      }}
+    />
   )
 }
