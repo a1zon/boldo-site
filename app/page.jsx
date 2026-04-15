@@ -510,38 +510,6 @@ export default function Home() {
                     </p>
                   </form>
                 </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium text-black/70">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-black/10 rounded-xl bg-white/90 text-black placeholder:text-black/30 font-medium focus:outline-none focus:border-[--brand-600]/40"
-                      placeholder="you@email.com"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium text-black/70">
-                      Tell us about your project
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={5}
-                      value={formData.message}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-black/10 rounded-xl bg-white/90 text-black placeholder:text-black/30 font-medium focus:outline-none focus:border-[--brand-600]/40"
-                      placeholder="Product type, platform, timeline, expected results"
-                    />
-                  </div>
-                  {submitStatus === 'success' && (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 font-medium">
-                      ✓ Request sent! We'll get back to you within 24 hours.
-                    </div>
-                  )}
-                  {submitStatus === 'error' && (
               </div>
             </div>
           </div>

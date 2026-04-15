@@ -6,34 +6,31 @@ export async function POST(request) {
   try {
     const { name, company, email, message } = await request.json();
 
-    // Валидация
     if (!name || !email || !message) {
       return Response.json(
-        { error: 'Пожалуйста заполните все обязательные поля' },
+        { error: 'Please fill in all required fields' },
         { status: 400 }
       );
     }
 
-    // Валидация формата email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       return Response.json(
-        { error: 'Пожалуйста введите корректный email адрес' },
+        { error: 'Please enter a valid email address' },
         { status: 400 }
       );
     }
 
-    // Отправляем на ящик
     const data = await resend.emails.send({
       from: 'Boldo Contact Form <onboarding@resend.dev>',
       to: 'gam301005@gmail.com',
-      subject: `Новая заявка от ${name}`,
+      subject: `New inquiry from ${name}`,
       html: `
-        <h2>Новая заявка с сайта</h2>
-        <p><strong>Имя:</strong> ${name}</p>
-        <p><strong>Компания:</strong> ${company || 'не указана'}</p>
+        <h2>New website inquiry</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Company:</strong> ${company || 'not specified'}</p>
         <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Сообщение:</strong></p>
+        <p><strong>Message:</strong></p>
         <p>${message.replace(/\n/g, '<br>')}</p>
       `,
       replyTo: email.trim(),
@@ -47,13 +44,13 @@ export async function POST(request) {
     }
 
     return Response.json(
-      { success: true, message: 'Заявка отправлена' },
+      { success: true, message: 'Request sent' },
       { status: 200 }
     );
   } catch (error) {
     console.error('Contact form error:', error);
     return Response.json(
-      { error: 'Ошибка сервера. Попробуйте позже.' },
+      { error: 'Server error. Please try again later.' },
       { status: 500 }
     );
   }
