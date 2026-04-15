@@ -154,13 +154,13 @@ export default function Home() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Ошибка при отправке'); setSubmitStatus('error'); setIsLoading(false); return; }
+      if (!res.ok) { setError(data.error || 'Submission error'); setSubmitStatus('error'); setIsLoading(false); return; }
       setSubmitStatus('success');
       setFormData({ name: '', company: '', email: '', message: '' });
       setIsLoading(false);
       setTimeout(() => setSubmitStatus(null), 3000);
     } catch {
-      setError('Ошибка подключения');
+      setError('Connection error');
       setSubmitStatus('error');
       setIsLoading(false);
     }
@@ -441,8 +441,8 @@ export default function Home() {
 
                   <form onSubmit={handleSubmit} className="space-y-5 relative">
                     {[
-                      { id: "name", label: "Имя", type: "text", placeholder: "Ваше имя" },
-                      { id: "company", label: "Компания", type: "text", placeholder: "Название компании" },
+                      { id: "name", label: "Name", type: "text", placeholder: "Your name" },
+                      { id: "company", label: "Company", type: "text", placeholder: "Company name" },
                       { id: "email", label: "Email", type: "email", placeholder: "you@email.com" },
                     ].map((field) => (
                       <div key={field.id} className="space-y-2">
@@ -464,7 +464,7 @@ export default function Home() {
 
                     <div className="space-y-2">
                       <label htmlFor="message" className={`text-sm font-medium transition-colors duration-200 ${focusedField === "message" ? "text-[--brand-600]" : "text-black/70"}`}>
-                        Расскажите о проекте
+                        Tell us about your project
                       </label>
                       <textarea
                         id="message"
@@ -474,19 +474,19 @@ export default function Home() {
                         onFocus={() => setFocusedField("message")}
                         onBlur={() => setFocusedField(null)}
                         className="w-full px-4 py-3 border border-black/10 rounded-xl bg-white text-black placeholder:text-black/30 font-medium focus:outline-none focus:border-[--brand-500] focus:ring-2 focus:ring-[--brand-500]/10 transition-all duration-200 resize-none"
-                        placeholder="Тип продукта, платформа, сроки, ожидаемый результат"
+                        placeholder="Product type, platform, timeline, expected results"
                       />
                     </div>
 
                     {submitStatus === 'success' && (
                       <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 font-medium flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <span className="text-emerald-500">✓</span>
-                        Заявка отправлена! Мы свяжемся с вами в течение 24 часов.
+                        Request sent! We'll get back to you within 24 hours.
                       </div>
                     )}
                     {submitStatus === 'error' && (
                       <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-medium animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        ✕ {error || 'Ошибка при отправке. Попробуйте позже.'}
+                        ✕ {error || 'Submission failed. Please try again later.'}
                       </div>
                     )}
 
@@ -499,17 +499,49 @@ export default function Home() {
                       {isLoading ? (
                         <span className="flex items-center gap-2">
                           <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Отправляю...
+                          Sending...
                         </span>
                       ) : (
-                        'Отправить запрос на аудит'
+                        'Request a free audit'
                       )}
                     </Button>
                     <p className="text-xs text-black/40 font-medium text-center">
-                      Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.
+                      By clicking, you agree to our privacy policy. We do not share your data with third parties.
                     </p>
                   </form>
                 </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium text-black/70">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-black/10 rounded-xl bg-white/90 text-black placeholder:text-black/30 font-medium focus:outline-none focus:border-[--brand-600]/40"
+                      placeholder="you@email.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="message" className="text-sm font-medium text-black/70">
+                      Tell us about your project
+                    </label>
+                    <textarea
+                      id="message"
+                      rows={5}
+                      value={formData.message}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-black/10 rounded-xl bg-white/90 text-black placeholder:text-black/30 font-medium focus:outline-none focus:border-[--brand-600]/40"
+                      placeholder="Product type, platform, timeline, expected results"
+                    />
+                  </div>
+                  {submitStatus === 'success' && (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 font-medium">
+                      ✓ Request sent! We'll get back to you within 24 hours.
+                    </div>
+                  )}
+                  {submitStatus === 'error' && (
               </div>
             </div>
           </div>
@@ -528,9 +560,9 @@ export default function Home() {
             </div>
             <nav className="flex flex-wrap gap-2 text-sm font-medium">
               {[
-                { href: "#services", label: "Услуги" },
-                { href: "#cases", label: "Кейсы" },
-                { href: "#contact", label: "Контакты" },
+                { href: "#services", label: "Services" },
+                { href: "#cases", label: "Cases" },
+                { href: "#contact", label: "Contacts" },
               ].map((link) => (
                 <Link
                   key={link.href}

@@ -59,7 +59,7 @@ export function HeroPresentation() {
               </p>
 
               <p className="mt-10 text-center lg:text-left text-2xl md:text-3xl font-semibold text-black/90">
-                Helping  launch stable products with{" "}
+                Helping launch stable products with{" "}
                 <span className="text-[--brand-600]">maximum ROI.</span>
               </p>
 
@@ -123,7 +123,7 @@ export function HeroPresentation() {
 
           {/* marquee row */}
           <div className="relative py-7 border-t border-black/5 bg-white/80 overflow-hidden">
-            <div className="px-6 md:px-10">
+            <div>
               <Marquee
                 className="py-1"
                 speedSeconds={22}
